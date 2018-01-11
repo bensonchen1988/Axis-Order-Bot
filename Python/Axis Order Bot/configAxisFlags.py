@@ -1,0 +1,1 @@
+inbox_forwarding = False #Set to True to forward all inbox messages this bot receives to a user defined in configAxis.forward_username
