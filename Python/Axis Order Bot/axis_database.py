@@ -16,7 +16,7 @@ db = MySQLDatabase(configAxisDB.schema, host=configAxisDB.host, port=configAxisD
 class Members(Model):
 	class Meta:
 		database = db
-		db_table = "members"
+		db_table = configAxisDB.members_table
 		primary_key = CompositeKey('username', 'member_number')
 
 	username = CharField()
@@ -26,7 +26,7 @@ class Members(Model):
 class Replied_Comments(Model):
 	class Meta:
 		database = db
-		db_table = "replied_comments"
+		db_table = configAxisDB.comments_table
 	comment_id = CharField()
 
 #Returns the join order of this member.
