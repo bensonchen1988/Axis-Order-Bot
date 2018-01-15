@@ -61,7 +61,8 @@ def spread_the_word():
 					db.record_comment(comment.id)
 
 				if check_word(comment.body.lower()) and not has_comment and comment.author != r.user.me() and not db.has_faith(comment.author.name):
-					invite(comment)
+					logger.info("Comment found: "+comment.id)
+					invite(comment, None)
 
 				if any(x in comment.body.lower() for x in configAxis.bot_call_words) and not has_comment and comment.author != r.user.me():
 					if "join" in comment.body.lower():
@@ -120,7 +121,7 @@ def invite(comment, referralname):
 		comment.reply(get_invite_image()+get_footer()+" ^("+configAxis.invitation+referralname+")")
 
 
-	log_body = "Replied to user "+comment.author.name+" at https://www.reddit.com/r/"+configAxis.subreddit+"/comments/"+comment.link_id[3:]+"//"+comment.id
+	log_body = "Replied to user "+comment.author.name
 	logger.info(log_body)
 
 #Sends spam to target submission
