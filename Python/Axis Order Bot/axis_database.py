@@ -10,13 +10,13 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
 logger.setLevel(logging.INFO)
 
-db = MySQLDatabase(configAxisDB.schema, host=configAxisDB.host, port=configAxisDB.port, user=configAxisDB.username, passwd=configAxisDB.password, threadlocals = True)
+db = PostgresqlDatabase(configAxisDB.schema, user=configAxisDB.username, password=configAxisDB.password, host=configAxisDB.host)
 
 
 class Members(Model):
 	class Meta:
 		database = db
-		db_table = configAxisDB.members_table
+		db_table = "members_postgres"
 		primary_key = CompositeKey('username', 'member_number')
 
 	username = CharField()
@@ -26,7 +26,7 @@ class Members(Model):
 class Replied_Comments(Model):
 	class Meta:
 		database = db
-		db_table = configAxisDB.comments_table
+		db_table = "replied_comments_postgres"
 	comment_id = CharField()
 
 #Returns the join order of this member.
@@ -91,3 +91,7 @@ def add_referral(user_name):
 
 def close_connection():
 	db.close()
+
+
+def safe_create_tables():
+	db.create_tables([Members, Replied_Comments], safe=True)

@@ -1,4 +1,4 @@
-#Giant Frog; 0~4
+#Giant Toad; 0~4
 #SS: 5~9
 #SM/M: 10~14
 #DF: 15~19
@@ -9,7 +9,7 @@
 #KW: 50~999999999
 def get_rank(points):
 	if points < 5:
-		return "Giant Frog"
+		return "Giant Toad"
 	if points < 10:
 		return "Street Solicitor"
 	if points < 15:
@@ -28,7 +28,7 @@ def get_rank(points):
 
 
 def next_threshold(current_rank):
-	if current_rank == "Giant Frog":
+	if current_rank == "Giant Toad":
 		return 5
 	if current_rank == "Street Solicitor":
 		return 10

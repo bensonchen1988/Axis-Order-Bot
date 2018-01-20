@@ -8,7 +8,7 @@ import os
 import random
 import datetime
 import logging
-import axis_database as db
+import axis_Database as db
 import threading
 from threading import Thread
 from praw.models import Comment
@@ -30,7 +30,7 @@ def bot_login():
 	return login
 
 def check_word(body):
-	if "!axisbot" in body:
+	if any(x in body for x in configAxis.bot_call_words):
 		return False
 
 	for word in configAxis.hit_words:
@@ -66,7 +66,7 @@ def spread_the_word():
 
 				if any(x in comment.body.lower() for x in configAxis.bot_call_words) and not has_comment and comment.author != r.user.me():
 					if "join" in comment.body.lower():
-						sign_them_up(comment)
+						sign_them_up(comment)\
 					
 					if not db.has_faith(comment.author.name):
 						comment.reply(configAxis.not_a_member)
@@ -102,7 +102,10 @@ def check_inbox():
 			continue
 		if "/u/axis_order" in message.body.lower() and not db.has_comment(message.id):
 			db.record_comment(message.id)
-			member_functions(message)
+			if not db.has_faith(message.author.name):
+				message.reply(configAxis.not_a_member)
+			else:
+				member_functions(message)
 			continue
 
 def forward_inbox(message):
@@ -227,6 +230,7 @@ def get_subreddits():
 	return result
 
 r = bot_login()
+db.safe_create_tables()
 
 while True:
 	try:
