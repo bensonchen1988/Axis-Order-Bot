@@ -4,6 +4,7 @@ from peewee import *
 import logging
 from urllib import parse
 import os
+import axisUtility
 
 logger = logging.getLogger('axis_order_db')
 hdlr = logging.FileHandler('axis_order_db.log')
@@ -100,10 +101,11 @@ def get_referrals(user_name):
 	db.close()
 	return answer
 
-def add_referral(user_name):
+def add_referral(user_name, points):
 	db.connect()
+	logger.info(user_name +" gained "+str(points)+" "+axisUtility.add_s(points, "point"))
 	update_target = Members.select().where(Members.username == user_name).get()
-	update_target.referrals += 1
+	update_target.referrals += points
 	update_target.save()
 	db.close()
 
