@@ -2,6 +2,8 @@ import peewee
 import configAxisDB
 from peewee import *
 import logging
+from urllib import parse
+import os
 
 logger = logging.getLogger('axis_order_db')
 hdlr = logging.FileHandler('axis_order_db.log')
@@ -10,13 +12,21 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
 logger.setLevel(logging.INFO)
 
-db = PostgresqlDatabase(configAxisDB.schema, user=configAxisDB.username, password=configAxisDB.password, host=configAxisDB.host)
+if os.environ.get('DATABASE_URL'):
+	db_url = os.environ.get('DATABASE_URL')
+	creds = parse.urlparse(db_url)
+	db = PostgresqlDatabase(creds.path[1:], user = creds.username, password = creds.password, host = creds.hostname, port = creds.port)
+else:
+	db = PostgresqlDatabase(configAxisDB.schema, 
+		user=configAxisDB.username, 
+		password=configAxisDB.password, 
+		host=configAxisDB.host)
 
 
 class Members(Model):
 	class Meta:
 		database = db
-		db_table = "members_postgres"
+		db_table = "members_postgres_fku"
 		primary_key = CompositeKey('username', 'member_number')
 
 	username = CharField()
@@ -40,6 +50,13 @@ def get_member_number(username):
 	logger.info("disconnected - member number for "+username+", result: "+answer)
 	return answer
 
+def get_member_number_for_signup():
+	if not Members.select().exists():
+		return 1;
+
+	result = Members.select(fn.max(Members.member_number))
+	return result.next()+1
+
 def has_faith(username):
 	db.connect()
 	#logger.info("connected - faith check for "+username)
@@ -59,7 +76,8 @@ def has_comment(comment_id):
 
 def member_signup(user_name):
 	db.connect()
-	Members.create(username = user_name, referrals = 0)
+	id = get_member_number_for_signup()
+	Members.create(username = user_name, member_number = id, referrals = 0)
 	db.close()
 	logger.info("member signed up: "+user_name)
 

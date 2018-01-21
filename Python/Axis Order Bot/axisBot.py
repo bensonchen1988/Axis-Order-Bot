@@ -8,7 +8,7 @@ import os
 import random
 import datetime
 import logging
-import axis_Database as db
+import axis_database as db
 import threading
 from threading import Thread
 from praw.models import Comment
@@ -22,10 +22,10 @@ logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
 def bot_login():
-	login= praw.Reddit(username = configAxis.username, 
-			password = configAxis.password, 
-			client_id = configAxis.client_id, 
-			client_secret = configAxis.client_secret, 
+	login= praw.Reddit(username = os.environ['REDDIT_USERNAME'], 
+			password = os.environ['REDDIT_PASSWORD'], 
+			client_id = os.environ['REDDIT_CLIENT_ID'], 
+			client_secret = os.environ['REDDIT_CLIENT_SECRET'], 
 			user_agent = "AxisCultCultivator")
 	return login
 
