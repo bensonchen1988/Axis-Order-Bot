@@ -5,6 +5,7 @@ import logging
 from urllib import parse
 import os
 import axisUtility
+import datetime
 
 logger = logging.getLogger('axis_order_db')
 hdlr = logging.FileHandler('axis_order_db.log')
@@ -27,7 +28,7 @@ else:
 class Members(Model):
 	class Meta:
 		database = db
-		db_table = "members_postgres_fku"
+		db_table = "members"
 		primary_key = CompositeKey('username', 'member_number')
 
 	username = CharField()
@@ -37,8 +38,9 @@ class Members(Model):
 class Replied_Comments(Model):
 	class Meta:
 		database = db
-		db_table = "replied_comments_postgres"
-	comment_id = CharField()
+		db_table = "replied_comments"
+	comment_id = CharField(primary_key=True)
+	time_entered = DateTimeField(default=datetime.datetime.now)
 
 #Returns the join order of this member.
 #ASSUMES MEMBER DOES EXIST ALREADY
@@ -114,4 +116,19 @@ def close_connection():
 
 
 def safe_create_tables():
+	db.connect()
 	db.create_tables([Members, Replied_Comments], safe=True)
+	db.close()
+
+#trims the replied_comments table down to the %threshold% newest comments
+def trim_replied_comments(threshold):
+	db.connect()
+	n = 0
+	for comment in Replied_Comments.select().order_by(Replied_Comments.time_entered.desc()):
+		n += 1
+		if n > threshold:
+			print("deleting comment "+comment.comment_id)
+			logger.info("deleting comment "+comment.comment_id)
+			comment.delete_instance()
+	db.close()
+

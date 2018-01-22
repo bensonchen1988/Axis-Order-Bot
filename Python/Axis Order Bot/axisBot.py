@@ -13,6 +13,7 @@ import threading
 from threading import Thread
 from praw.models import Comment
 from praw.models import Submission
+import traceback
 
 logger = logging.getLogger('axis_order')
 hdlr = logging.FileHandler('axis_order.log')
@@ -40,14 +41,12 @@ def check_word(body):
 	return False		
 
 def run_bot(r):
-	thread1 = Thread(target = check_inbox, args = ())
-	thread2 = Thread(target = spread_the_word, args = ())
-	thread1.start()
-	print("t1 started")
-	thread2.start()
-	print("t2 started")
-	thread1.join()
-	thread2.join()
+	check_inbox()
+	print("checked inbox")
+	spread_the_word()
+	print("checked newest "+str(configAxis.comment_limit)+" comments")
+	db.trim_replied_comments(configAxis.comment_limit)
+	print("finished trimming replied comments")
 	print("sleeping for 10s")	
 	time.sleep(10)
 
@@ -55,16 +54,16 @@ def run_bot(r):
 def spread_the_word():
 	try:
 		for subreddit in configAxis.subreddits:
-			for comment in r.subreddit(subreddit).comments(limit = 50):
+			for comment in r.subreddit(subreddit).comments(limit = configAxis.comment_limit):
 				has_comment = db.has_comment(comment.id)
-				if not has_comment:
-					db.record_comment(comment.id)
 
 				if check_word(comment.body.lower()) and not has_comment and comment.author != r.user.me() and not db.has_faith(comment.author.name):
+					db.record_comment(comment.id)
 					logger.info("Comment found: "+comment.id)
 					invite(comment, None)
 
 				if any(x in comment.body.lower() for x in configAxis.bot_call_words) and not has_comment and comment.author != r.user.me():
+					db.record_comment(comment.id)
 					member_functions(comment)
 
 	except praw.exceptions.APIException as ex:
@@ -75,7 +74,7 @@ def spread_the_word():
 		pass
 
 #Checks inbox for comment applications or bot username-mention calls
-#If configAxisFlags.inbox_forwading is True, forwards all unread messages to the username specified at configAxis.forward_username
+#If configAxisFlags.inbox_forwarding is True, forwards all unread messages to the username specified at configAxis.forward_username
 def check_inbox():
 	for message in r.inbox.unread():
 		message.mark_read()
@@ -145,10 +144,10 @@ def member_functions(comment):
 
 		if "all" in comment.body.lower() or "-a" in comment.body.lower():
 			db.add_referral(comment.author.name, 2)
-			comment.reply("You'ved gained 2 points for reciting all the teachings maniacally in one breath!: \n\n"+get_all_teachings()+get_footer())
+			comment.reply("You've gained 2 points for reciting all the teachings maniacally in one breath!: \n\n"+get_all_teachings()+get_footer())
 		else:
 			db.add_referral(comment.author.name, 1)
-			comment.reply("You'ved gained 1 point for reciting the following teachings!: \n\n"+get_random_teaching()+get_footer())
+			comment.reply("You've gained 1 point for reciting the following teachings!: \n\n"+get_random_teaching()+get_footer())
 		return
 
 	#助けてよ~！！
@@ -264,4 +263,5 @@ while True:
 		except:
 			pass
 		logger.exception(str(e))
+		traceback.print_exc()
 		pass

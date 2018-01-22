@@ -5,6 +5,9 @@ client_secret = ""
 subreddits = [""]
 forward_username = "" #User to forward all inbox messages this bot receives. To use, set configAxisFlags.inbox_forwarding to True
 
+#number of comments to sift through
+comment_limit = 100
+
 bot_call_words = ["!axisorder", "!axisbot", "axis_order", "!axis_bot", "!axis_order_bot", "!axisorderbot", "!axisorder_bot", "!axis_orderbot"]
 
 hit_words = ["aqua", "axis order", "eris order", "アクシズ教", "axis cult", "alcanretia", "eris-sama", "eris sama", "konosuba", "kono subarashii sekai"]
@@ -28,7 +31,8 @@ teachings = ["Axis Followers can get things done. And because you can get things
 "You need not to hold yourself back! Drink when you want, and eat when you want! Because you won't know if you'll be able to eat that again tomorrow!",
 "Do not fear growing old! Not even God knows whether or not you will be happy in the future, so you should, at least, be happy now!",
 "Slay the demons! Defeat the Devil King!",
-"ERIS PADS HER CHEST!!!!"]
+"ERIS PADS HER CHEST!!!!",
+"Thou shalt love big breasts. Though shalt love small breasts. Whether you're a lolicon or a NEET or a kemomimi lover, with the exception of undead or devil girls, as long as there is love and doesn't break the law, everything will be forgiven."]
 
 
 not_a_member = "Sorry, you must be a follower of the Axis Order in order to order the Axis Order bot around! Reply with \"!join\" to join, or join anytime by commenting \"!axisbot join\" anywhere in this subreddit!"
