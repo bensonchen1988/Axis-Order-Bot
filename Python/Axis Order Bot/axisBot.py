@@ -222,7 +222,7 @@ def sign_them_up(message):
 		
 
 def get_footer():
-	return "\n\n ***** \n\n ^(I am a bot created to spread faith for the wonderful and divine Water Goddess Aqua! Reply \"!join\" to this bot to join the blessed Axis Order today! We currently have "+db.get_number_of_members()+" followers! Reply !help for instructions, or message feedbacks to /u/"+configAxis.forward_username+"! [Point Rankings](https://www.reddit.com/r/"+configAxis.wiki_subreddit+"/wiki/"+configAxis.wiki_name+"))"
+	return "\n\n ***** \n\n ^(I am a bot created to spread faith for the wonderful and divine Water Goddess Aqua! Reply \"!join\" to this bot to join the blessed Axis Order today! We currently have "+db.get_number_of_members()+" followers! Reply !help for instructions, or message feedbacks to /u/"+configAxis.forward_username+"!) [^Point ^Rankings](https://www.reddit.com/r/"+configAxis.wiki_subreddit+"/wiki/"+configAxis.wiki_name+")"
 
 def get_invite_image():
 	return "["+random.choice(configAxis.phrases)+"](https://imgur.com/a/ArJlZ) \n\n"
