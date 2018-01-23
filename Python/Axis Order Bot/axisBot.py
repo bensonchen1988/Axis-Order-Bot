@@ -47,6 +47,8 @@ def run_bot(r):
 	print("checked newest "+str(configAxis.comment_limit)+" comments")
 	db.trim_replied_comments(configAxis.comment_limit)
 	print("finished trimming replied comments")
+	update_rankings()
+	print("updated rankings wiki at "+configAxis.wiki_subreddit)
 	print("sleeping for 10s")	
 	time.sleep(10)
 
@@ -143,11 +145,19 @@ def member_functions(comment):
 			return
 
 		if "all" in comment.body.lower() or "-a" in comment.body.lower():
-			db.add_referral(comment.author.name, 2)
-			comment.reply("You've gained 2 points for reciting all the teachings maniacally in one breath!: \n\n"+get_all_teachings()+get_footer())
+			all_message = ""
+			if db.can_receive_points_from_prayer(comment.author.name):
+				db.add_points(comment.author.name, 2)
+				all_message += "You've gained 2 points for reciting all the teachings maniacally in one breath!: \n\n"
+				db.update_pray_time(comment.author.name)
+			comment.reply(all_message+get_all_teachings()+get_footer())
 		else:
-			db.add_referral(comment.author.name, 1)
-			comment.reply("You've gained 1 point for reciting the following teachings!: \n\n"+get_random_teaching()+get_footer())
+			single_message = ""
+			if db.can_receive_points_from_prayer(comment.author.name):
+				db.add_points(comment.author.name, 1)
+				single_message += "You've gained 1 point for reciting the following teachings!: \n\n"
+				db.update_pray_time(comment.author.name)
+			comment.reply(single_message+get_random_teaching()+get_footer())
 		return
 
 	#助けてよ~！！
@@ -203,7 +213,7 @@ def sign_them_up(message):
 				comment = r.comment(message.id)
 				if configAxis.invitation in comment.parent().body:
 					wordlist = comment.parent().body.split()
-					db.add_referral(wordlist[-1][:-1], 5)
+					db.add_points(wordlist[-1][:-1], 5)
 					logger.info(wordlist[-1][:-1]+" has been credited +5 points for the referral")
 					print(wordlist[-1][:-1]+" has been credited +5 points for the referral")
 	else:
@@ -212,7 +222,7 @@ def sign_them_up(message):
 		
 
 def get_footer():
-	return "\n\n ***** \n\n ^(I am a bot created to spread faith for the wonderful and divine Water Goddess Aqua! Reply \"!join\" to this bot to join the blessed Axis Order today! We currently have "+db.get_number_of_members()+" followers! Reply !help for instructions, or message feedbacks to /u/"+configAxis.forward_username+"!)"
+	return "\n\n ***** \n\n ^(I am a bot created to spread faith for the wonderful and divine Water Goddess Aqua! Reply \"!join\" to this bot to join the blessed Axis Order today! We currently have "+db.get_number_of_members()+" followers! Reply !help for instructions, or message feedbacks to /u/"+configAxis.forward_username+"! [Point Rankings](https://www.reddit.com/r/"+configAxis.wiki_subreddit+"/wiki/"+configAxis.wiki_name+"))"
 
 def get_invite_image():
 	return "["+random.choice(configAxis.phrases)+"](https://imgur.com/a/ArJlZ) \n\n"
@@ -246,6 +256,10 @@ def get_subreddits():
 	for sub in configAxis.subreddits:
 		result += "/r/"+sub+" "
 	return result
+
+def update_rankings():
+	wiki = r.subreddit(configAxis.wiki_subreddit).wiki[configAxis.wiki_name]
+	wiki.edit(db.get_ranking_string())
 
 r = bot_login()
 db.safe_create_tables()

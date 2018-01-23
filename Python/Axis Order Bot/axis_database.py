@@ -34,6 +34,7 @@ class Members(Model):
 	username = CharField()
 	member_number = IntegerField()
 	referrals = IntegerField()
+	time_last_prayed = DateTimeField(default=datetime.datetime(1, 1, 1, 0, 0))
 
 class Replied_Comments(Model):
 	class Meta:
@@ -43,7 +44,7 @@ class Replied_Comments(Model):
 	time_entered = DateTimeField(default=datetime.datetime.now)
 
 #Returns the join order of this member.
-#ASSUMES MEMBER DOES EXIST ALREADY
+#assumes user exists
 def get_member_number(username):
 	db.connect()
 	logger.info("connected - member number for "+username)
@@ -77,18 +78,19 @@ def has_comment(comment_id):
 	return result
 
 
+#assumes user doesn't exist
 def member_signup(user_name):
 	db.connect()
-	id = get_member_number_for_signup()
-	Members.create(username = user_name, member_number = id, referrals = 0)
+	member_number_result = get_member_number_for_signup()
+	Members.create(username = user_name, member_number = member_number_result, referrals = 0)
 	db.close()
 	logger.info("member signed up: "+user_name)
 
-def record_comment(id):
+def record_comment(target_id):
 	db.connect()
-	Replied_Comments.create(comment_id = id)
+	Replied_Comments.create(comment_id = target_id)
 	db.close()
-	logger.info("comment id recorded: "+id)
+	logger.info("comment id recorded: "+target_id)
 
 def get_number_of_members():
 	db.connect()
@@ -96,6 +98,7 @@ def get_number_of_members():
 	db.close()
 	return result
 
+#assumes user exists
 def get_referrals(user_name):
 	db.connect()
 	result = Members.select(Members.referrals).where(Members.username == user_name).execute()
@@ -103,7 +106,8 @@ def get_referrals(user_name):
 	db.close()
 	return answer
 
-def add_referral(user_name, points):
+#assumes user exists
+def add_points(user_name, points):
 	db.connect()
 	logger.info(user_name +" gained "+str(points)+" "+axisUtility.add_s(points, "point"))
 	update_target = Members.select().where(Members.username == user_name).get()
@@ -132,3 +136,29 @@ def trim_replied_comments(threshold):
 			comment.delete_instance()
 	db.close()
 
+#checks if 22 hours has passed since last prayer
+#assumes user exists
+def can_receive_points_from_prayer(user_name):
+	db.connect()
+	result = Members.select().where(Members.username == user_name and Members.time_last_prayed <= (datetime.datetime.now() - datetime.timedelta(hours = 22))).exists()
+	db.close()
+	return result
+
+
+def update_pray_time(user_name):
+	db.connect()
+	update_target = Members.select().where(Members.username == user_name).get()
+	update_target.time_last_prayed = datetime.datetime.now()
+	update_target.save()
+	db.close()
+
+def get_ranking_string():
+	db.connect()
+	result_string = "Rank| Member | Points\n"
+	result_string += "---|---|----\n"
+	rank = 1
+	for member in Members.select().order_by(Members.referrals.desc()).limit(10):
+		result_string += str(rank)+"| "+member.username+" |"+str(member.referrals)+"\n"
+		rank += 1
+	db.close()
+	return result_string

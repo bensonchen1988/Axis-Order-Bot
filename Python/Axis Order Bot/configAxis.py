@@ -3,6 +3,8 @@ password = ""
 client_id = ""
 client_secret = ""
 subreddits = [""]
+wiki_subreddit = ""
+wiki_name = ""
 forward_username = "" #User to forward all inbox messages this bot receives. To use, set configAxisFlags.inbox_forwarding to True
 
 #number of comments to sift through
