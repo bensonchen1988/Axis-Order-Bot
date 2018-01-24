@@ -190,7 +190,7 @@ def invite(comment, referralname):
 #Sends spam to target submission
 def invite_submission(submission, inviting_comment):
 	print("Inviting submission")
-	submission.reply(get_invite_image()+get_footer()+" ^("+configAxis.invitation+inviting_comment.author.name+" )")
+	submission.reply(get_invite_image()+get_footer()+" ^("+configAxis.invitation+inviting_comment.author.name+")")
 	logger.info("Replied to submission at "+submission.shortlink)
 	print("Replied to submission at "+submission.shortlink)
 	db.record_comment(submission.id)
