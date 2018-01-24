@@ -58,8 +58,8 @@ def get_member_number_for_signup():
 	if not Members.select().exists():
 		return 1;
 
-	result = Members.select(fn.max(Members.member_number))
-	return result.next()+1
+	result = Members.select(fn.max(Members.member_number)).execute()
+	return result.next().member_number+1
 
 def has_faith(username):
 	db.connect()
