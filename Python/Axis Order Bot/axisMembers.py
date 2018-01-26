@@ -1,4 +1,5 @@
 import axisUtility as util
+import axisRank as ranker
 import axis_database as db
 import configAxis
 import praw
@@ -16,9 +17,6 @@ logger.setLevel(logging.INFO)
 
 def member_invite(comment):
 	target_comment = comment.parent()
-	if not db.has_faith(comment.author.name):
-		comment.reply(configAxis.not_a_member)
-		return
 	logger.info(comment.author.name + " initiated an invite on "+target_comment.author.name)
 	print(comment.author.name + " initiated an invite on "+target_comment.author.name)
 	if db.has_faith(target_comment.author.name):
@@ -32,15 +30,9 @@ def member_invite(comment):
 			_invite_comment(target_comment, comment.author.name)
 
 def member_stats(comment):
-	if not db.has_faith(comment.author.name):
-		comment.reply(configAxis.not_a_member)
-		return
 	_reply_stats(comment)
 
 def member_pray(comment):
-	if not db.has_faith(comment.author.name):
-		comment.reply(configAxis.not_a_member)
-		return
 
 	if "all" in comment.body.lower() or "-a" in comment.body.lower():
 		all_message = ""

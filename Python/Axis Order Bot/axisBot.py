@@ -97,10 +97,11 @@ def check_inbox():
 			continue
 		if "/u/axis_order" in message.body.lower() and not db.has_comment(message.id):
 			db.record_comment(message.id)
-			if not db.has_faith(message.author.name):
-				message.reply(configAxis.not_a_member)
-			else:
-				parse_parameters(message)
+			if any(x == message.subreddit.display_name for x in configAxis.blacklisted_subreddits):
+				print("blacklisted subreddit: "+message.subreddit.display_name)
+				r.redditor(message.author.name).message("Subreddit is blacklisted!", "Sorry, you've attempted to summon me into /r/"+message.subreddit.display_name+", which is blacklisted!")
+				continue
+			parse_parameters(message)
 			continue
 		#admin only function (all-member broadcasting)
 		if "!broadcast" in message.body.lower() and message.author.name == configAxis.forward_username:
@@ -127,31 +128,39 @@ def bot_invite(comment):
 
 
 #Bot call parameter handling
+#Allows multiple parameter call
 def parse_parameters(comment):
+	#助けてよ~！！
+	if "help" in comment.body.lower():
+		comment.reply(util.get_help())
+
+	#Someone wants to join via botcall LOL! GET SCAMMED BRUH
+	if "join" in comment.body.lower():
+		sign_them_up(comment)
+
+	#Faith check
+	if not db.has_faith(comment.author.name):
+		comment.reply(configAxis.not_a_member)	
+
+	#=========MEMBERS ONLY FUNCTION START============
 	#invites the author of the parent comment to this current comment if that person has not yet joined the order
 	if "invite" in comment.body.lower():
 		#members only function
 		members.member_invite(comment)
-		return
-	#replies stats of author of comment
-	if "stats" in comment.body.lower():
-		#members only function
-		members.member_stats(comment)
-		return
 
 	#アクシズ教、教義！
 	if any(x in comment.body.lower() for x in configAxis.teaching_hit_words):
 		#members only function
 		members.member_pray(comment)
-		return
 
-	#助けてよ~！！
-	if "help" in comment.body.lower():
-		comment.reply(get_help())
+	#replies stats of author of comment
+	if "stats" in comment.body.lower():
+		#members only function
+		members.member_stats(comment)
 
-	#Someone wants to join via botcall LOL! GET SCAMMED BRUH
-	if "join" in comment.body.lower():
-		sign_them_up(comment)
+
+	#=========MEMBERS ONLY FUNCTION END============
+
 
 
 def forward_inbox(message):

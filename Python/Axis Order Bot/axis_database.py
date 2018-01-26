@@ -140,9 +140,10 @@ def trim_replied_comments(threshold):
 #assumes user exists
 def can_receive_points_from_prayer(user_name):
 	db.connect()
-	result = Members.select().where(Members.username == user_name and Members.time_last_prayed <= (datetime.datetime.now() - datetime.timedelta(hours = 22))).exists()
+	result = Members.select().where(Members.username == user_name).execute()
+	member = result.next()
 	db.close()
-	return result
+	return member.time_last_prayed <= datetime.datetime.now() - datetime.timedelta(hours = 22)
 
 
 def update_pray_time(user_name):
