@@ -154,11 +154,38 @@ def update_pray_time(user_name):
 
 def get_ranking_string():
 	db.connect()
+
+	if not Members.select().exists():
+		db.close()
+		return "We have no members..... Aqua-sama? AQUA-SAMA!?!?!? AQUA-SAMAAAAAAAAAAAAAAAAAAA!!!!"
+
 	result_string = "Rank| Member | Points\n"
 	result_string += "---|---|----\n"
 	rank = 1
-	for member in Members.select().order_by(Members.referrals.desc()).limit(10):
-		result_string += str(rank)+"| "+member.username+" |"+str(member.referrals)+"\n"
-		rank += 1
+	current_points = _get_max_points()
+	members_string = ""
+	for member in Members.select().order_by(Members.referrals.desc(), Members.username.asc()):
+		if member.referrals < current_points:
+			result_string += str(rank)+"| "+members_string[:-2]+" |"+str(current_points)+"\n"
+			members_string = member.username+", "
+			current_points = member.referrals
+			rank += 1
+		else:
+			members_string += member.username+", "
+
+	result_string += str(rank)+"| "+members_string[:-2]+" |"+str(current_points)+"\n"
+	
 	db.close()
 	return result_string
+
+def _get_max_points():
+	result = Members.select(fn.max(Members.referrals)).execute()
+	return result.next().referrals
+
+def get_all_member_usernames():
+	db.connect()
+	result_list = []
+	for member in Members.select(Members.username):
+		result_list.append(member.username)
+	db.close()
+	return result_list

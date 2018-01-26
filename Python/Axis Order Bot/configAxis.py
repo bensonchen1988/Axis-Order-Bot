@@ -6,6 +6,7 @@ subreddits = [""]
 wiki_subreddit = ""
 wiki_name = ""
 forward_username = "" #User to forward all inbox messages this bot receives. To use, set configAxisFlags.inbox_forwarding to True
+invite_image = "https://imgur.com/a/ArJlZ"
 
 #number of comments to sift through
 comment_limit = 100
@@ -14,7 +15,7 @@ bot_call_words = ["!axisorder", "!axisbot", "axis_order", "!axis_bot", "!axis_or
 
 hit_words = ["aqua", "axis order", "eris order", "アクシズ教", "axis cult", "alcanretia", "eris-sama", "eris sama", "konosuba", "kono subarashii sekai"]
 
-teaching_hit_words = ["commandment", "teaching", "dogma", "doctrine"]
+teaching_hit_words = ["commandment", "teaching", "dogma", "doctrine", "pray"]
 
 phrases = ["Join today and receive free soap!", 
 "If only you had Holy Goddess Aqua's protection, then you could save me from this filthy Eris follower!",
@@ -44,5 +45,5 @@ help_table1 = "Parameter| Members Only | What it does\n"
 help_table2 = "---|---|----\n"
 help_table3 = "invite| Yes | Makes the bot reply an invitation to the comment you've replied to, with you as the referral. You will be credited 5 points whenever anyone joins the order via that invitation.\n"
 help_table4 = "stats| Yes| Makes the bot reply to you with your membership number, points, and points until next rank.\n"
-help_table5 = "commandment **OR** teaching **OR** dogma **OR** doctrine| Yes| Makes the bot recite one random teaching of the Axis Order! Add ***all*** or ***-a*** to recite all of the teachings at once!\n"
+help_table5 = "commandment **OR** teaching **OR** dogma **OR** doctrine **OR** pray| Yes| Makes the bot recite one random teaching of the Axis Order! Add ***all*** or ***-a*** to recite all of the teachings at once! You can gain 1 point (3 points for an all-recite) once every 22 hours for reciting!\n"
 help_table6 = "help| No | Displays this\n"	
