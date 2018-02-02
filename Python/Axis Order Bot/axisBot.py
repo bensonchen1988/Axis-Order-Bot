@@ -61,7 +61,7 @@ def spread_the_word():
 					db.record_comment(comment.id)
 					logger.info("Comment found: "+comment.id)
 					#bot default invite
-					bot_invite(comment, None)
+					bot_invite(comment)
 
 				if any(x in comment.body.lower() for x in configAxis.bot_call_words) and not has_comment and comment.author != r.user.me():
 					db.record_comment(comment.id)
@@ -140,7 +140,8 @@ def parse_parameters(comment):
 
 	#Faith check
 	if not db.has_faith(comment.author.name):
-		comment.reply(configAxis.not_a_member)	
+		comment.reply(configAxis.not_a_member)
+		return	
 
 	#=========MEMBERS ONLY FUNCTION START============
 	#invites the author of the parent comment to this current comment if that person has not yet joined the order
@@ -166,6 +167,9 @@ def parse_parameters(comment):
 def forward_inbox(message):
 	r.redditor(configAxis.forward_username).message("Inbox forward from "+configAxis.username+", from "+message.author.name, message.body)
 
+
+def send_exception(body):
+	r.redditor(configAxis.forward_username).message("Megumin's Explosion Created An Exception!", body)
 
 		
 def sign_them_up(message):
@@ -210,4 +214,5 @@ while True:
 			pass
 		logger.exception(str(e))
 		traceback.print_exc()
+		send_exception(traceback.format_exc())
 		pass
