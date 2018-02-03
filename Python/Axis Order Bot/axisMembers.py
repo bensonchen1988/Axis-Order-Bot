@@ -41,7 +41,7 @@ def member_pray(comment):
 			if comment.submission.fullname == configAxis.pray_submission_id:
 				points = 3
 			db.add_points(comment.author.name, points)
-			all_message += "You've gained "+str(points)+" points for reciting all the teachings maniacally in one breath!: \n\n"
+			all_message += "You've gained "+str(points)+" Axis Points for reciting all the teachings maniacally in one breath!: \n\n"
 			db.update_pray_time(comment.author.name)
 		comment.reply(all_message+util.get_all_teachings()+util.get_footer())
 	else:
@@ -51,7 +51,7 @@ def member_pray(comment):
 			if comment.submission.fullname == configAxis.pray_submission_id:
 				points = 2
 			db.add_points(comment.author.name, points)
-			single_message += "You've gained "+str(points)+" "+util.add_s(points, "point")+" for reciting the following teachings!: \n\n"
+			single_message += "You've gained "+str(points)+" Axis "+util.add_s(points, "Point")+" for reciting the following teachings!: \n\n"
 			db.update_pray_time(comment.author.name)
 		comment.reply(single_message+util.get_random_teaching()+util.get_footer())
 
@@ -83,4 +83,4 @@ def _reply_stats(comment):
 	points = int(db.get_referrals(comment.author.name))
 	rank = ranker.get_rank(points)
 	point_until_rank_up = ranker.next_threshold(rank) - points
-	comment.reply("You are member #"+db.get_member_number(comment.author.name)+" of "+db.get_number_of_members()+", and you hold the rank of "+rank+", with "+str(points)+" "+util.add_s(points, "point")+"! Your next rank up is "+str(point_until_rank_up)+" "+util.add_s(point_until_rank_up, "point")+" away!!!")
+	comment.reply("You are member #"+db.get_member_number(comment.author.name)+" of "+db.get_number_of_members()+", and you hold the rank of "+rank+", with Axis "+str(points)+" "+util.add_s(points, "Point")+"! Your next rank up is "+str(point_until_rank_up)+" Axis "+util.add_s(point_until_rank_up, "Point")+" away!!!")

@@ -43,7 +43,8 @@ def run_bot(r):
 	print("checked inbox")
 	spread_the_word()
 	print("checked newest "+str(configAxis.comment_limit)+" comments")
-	db.trim_replied_comments(configAxis.comment_limit)
+	#TEMPORARY 200 LIMIT
+	db.trim_replied_comments(configAxis.comment_limit+100)
 	print("finished trimming replied comments")
 	update_rankings()
 	print("updated rankings wiki at "+configAxis.wiki_subreddit)
@@ -55,16 +56,16 @@ def spread_the_word():
 	try:
 		for subreddit in configAxis.subreddits:
 			for comment in r.subreddit(subreddit).comments(limit = configAxis.comment_limit):
-				has_comment = db.has_comment(comment.id)
+				has_comment = db.has_comment(comment.id, subreddit)
 
 				if check_word(comment.body.lower()) and not has_comment and comment.author != r.user.me() and not db.has_faith(comment.author.name) and not any(x == subreddit for x in configAxis.manual_subreddits):
-					db.record_comment(comment.id)
+					db.record_comment(comment.id, subreddit)
 					logger.info("Comment found: "+comment.id)
 					#bot default invite
 					bot_invite(comment)
 
 				if any(x in comment.body.lower() for x in configAxis.bot_call_words) and not has_comment and comment.author != r.user.me():
-					db.record_comment(comment.id)
+					db.record_comment(comment.id, subreddit)
 					parse_parameters(comment)
 
 	except praw.exceptions.APIException as ex:
@@ -82,21 +83,17 @@ def check_inbox():
 		if configAxisFlags.inbox_forwarding:
 			forward_inbox(message)
 
-		if "!join" in message.body.lower() and not db.has_comment(message.id):
-			db.record_comment(message.id)
+		if "!join" in message.body.lower():
 			sign_them_up(message)
 			continue
-		if "!stats" in message.body.lower() and not db.has_comment(message.id):
+		if "!stats" in message.body.lower():
 			#members only function
 			members.member_stats(message)
-			db.record_comment(message.id)
 			continue
-		if "!help" in message.body.lower() and not db.has_comment(message.id):
-			db.record_comment(message.id)
+		if "!help" in message.body.lower():
 			message.reply(util.get_help())
 			continue
-		if "/u/axis_order" in message.body.lower() and not db.has_comment(message.id):
-			db.record_comment(message.id)
+		if "/u/axis_order" in message.body.lower():
 			if any(x == message.subreddit.display_name for x in configAxis.blacklisted_subreddits):
 				print("blacklisted subreddit: "+message.subreddit.display_name)
 				r.redditor(message.author.name).message("Subreddit is blacklisted!", "Sorry, you've attempted to summon me into /r/"+message.subreddit.display_name+", which is blacklisted!")
@@ -186,7 +183,7 @@ def sign_them_up(message):
 	if not db.has_faith(message.author.name):
 		print("Found a sucker!: "+message.author.name+" "+message.id)
 		db.member_signup(message.author.name)
-		message.reply("WELCOME TO THE BLESSED AXIS ORDER! You are member #"+db.get_member_number(message.author.name)+"! May you receive the blessings of the Holy Water Goddess Aqua!" +util.get_footer())
+		message.reply("WELCOME TO THE BLESSED AXIS ORDER! You are member #"+db.get_member_number(message.author.name)+"! Go forth and earn Axis Points by praying or inviting others to join (check the Help Wiki linked below)! May you receive the blessings of the Holy Water Goddess Aqua!" +util.get_footer())
 		logger.info(message.author.name +" has joined Axis Order!")
 		print(message.author.name +" has joined Axis Order!")
 		if isinstance(message, Comment) and not isinstance(message.parent(), Submission):

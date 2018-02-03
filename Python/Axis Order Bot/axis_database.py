@@ -1,5 +1,6 @@
 import peewee
 import configAxisDB
+import configAxis
 from peewee import *
 import logging
 from urllib import parse
@@ -44,6 +45,10 @@ class Replied_Comments(Model):
 	comment_id = CharField(primary_key=True)
 	time_entered = DateTimeField(default=datetime.datetime.now)
 
+def get_replied_comments_model(subreddit_name):
+	setattr(Replied_Comments._meta, "db_table", "replied_comments_"+subreddit_name)
+	return Replied_Comments
+
 #Returns the join order of this member.
 #assumes user exists
 def get_member_number(username):
@@ -70,10 +75,10 @@ def has_faith(username):
 	#logger.info("disconnected - faith check for "+username+", result: "+str(result))
 	return result
 
-def has_comment(comment_id):
+def has_comment(comment_id, subreddit):
 	db.connect()
 	#logger.info("connected - comment dupe check for "+comment_id)
-	result = Replied_Comments.select().where(Replied_Comments.comment_id == comment_id).exists()
+	result = get_replied_comments_model(subreddit).select().where(Replied_Comments.comment_id == comment_id).exists()
 	db.close()
 	#logger.info("disconnected - comment dupe check for "+comment_id+", result: "+str(result))
 	return result
@@ -87,9 +92,9 @@ def member_signup(user_name):
 	db.close()
 	logger.info("member signed up: "+user_name)
 
-def record_comment(target_id):
+def record_comment(target_id, subreddit_name):
 	db.connect()
-	Replied_Comments.create(comment_id = target_id)
+	get_replied_comments_model(subreddit_name).create(comment_id = target_id)
 	db.close()
 	logger.info("comment id recorded: "+target_id)
 
@@ -122,19 +127,23 @@ def close_connection():
 
 def safe_create_tables():
 	db.connect()
-	db.create_tables([Members, Replied_Comments], safe=True)
+	tablelist = [Members]
+	for subreddit_name in configAxis.subreddits:
+		tablelist.append(get_replied_comments_model(subreddit_name))
+	db.create_tables(tablelist, safe=True)
 	db.close()
 
 #trims the replied_comments table down to the %threshold% newest comments
 def trim_replied_comments(threshold):
 	db.connect()
-	n = 0
-	for comment in Replied_Comments.select().order_by(Replied_Comments.time_entered.desc()):
-		n += 1
-		if n > threshold:
-			print("deleting comment "+comment.comment_id)
-			logger.info("deleting comment "+comment.comment_id)
-			comment.delete_instance()
+	for subreddit_name in configAxis.subreddits:
+		n = 0
+		for comment in get_replied_comments_model(subreddit_name).select().order_by(Replied_Comments.time_entered.desc()):
+			n += 1
+			if n > threshold:
+				print("deleting comment "+comment.comment_id+" from "+getattr(get_replied_comments_model(subreddit_name)._meta, "db_table"))
+				logger.info("deleting comment "+comment.comment_id+" from "+subreddit_name)
+				comment.delete_instance()
 	db.close()
 
 #checks if 22 hours has passed since last prayer
@@ -161,7 +170,7 @@ def get_ranking_string():
 		db.close()
 		return "We have no members..... Aqua-sama? AQUA-SAMA!?!?!? AQUA-SAMAAAAAAAAAAAAAAAAAAA!!!!"
 
-	result_string = "Rank| Member | Points | Rank Title\n"
+	result_string = "Rank| Member | Axis Points | Rank Title\n"
 	result_string += "---|---|---|----\n"
 	rank = 1
 	current_points = _get_max_points()
