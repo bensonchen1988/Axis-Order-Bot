@@ -190,12 +190,12 @@ def sign_them_up(message):
 		logger.info(message.author.name +" has joined Axis Order!")
 		print(message.author.name +" has joined Axis Order!")
 		if isinstance(message, Comment) and not isinstance(message.parent(), Submission):
-				comment = r.comment(message.id)
-				if configAxis.invitation in comment.parent().body and comment.parent().author is r.user.me():
-					wordlist = comment.parent().body.split()
-					db.add_points(wordlist[-1][:-1], 5)
-					logger.info(wordlist[-1][:-1]+" has been credited +5 points for the referral")
-					print(wordlist[-1][:-1]+" has been credited +5 points for the referral")
+			comment = r.comment(message.id)
+			if configAxis.invitation in comment.parent().body and comment.parent().author.name == r.user.me().name:
+				wordlist = comment.parent().body.split()
+				db.add_points(wordlist[-1][:-1], 5)
+				logger.info(wordlist[-1][:-1]+" has been credited +5 points for the referral")
+				print(wordlist[-1][:-1]+" has been credited +5 points for the referral")
 	else:
 		num_members_string = db.get_number_of_members()
 		message.reply("Hello fellow faithful, it seems like you already belong to the wonderful Axis Order! You are member #"+db.get_member_number(message.author.name)+" of "+db.get_number_of_members()+" "+util.add_s(int(num_members_string), "member")+"!")
