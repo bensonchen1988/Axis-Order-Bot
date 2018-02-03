@@ -6,6 +6,7 @@ from urllib import parse
 import os
 import axisUtility
 import datetime
+import axisRank as ranker
 
 logger = logging.getLogger('axis_order_db')
 hdlr = logging.FileHandler('axis_order_db.log')
@@ -160,21 +161,21 @@ def get_ranking_string():
 		db.close()
 		return "We have no members..... Aqua-sama? AQUA-SAMA!?!?!? AQUA-SAMAAAAAAAAAAAAAAAAAAA!!!!"
 
-	result_string = "Rank| Member | Points\n"
-	result_string += "---|---|----\n"
+	result_string = "Rank| Member | Points | Rank Title\n"
+	result_string += "---|---|---|----\n"
 	rank = 1
 	current_points = _get_max_points()
 	members_string = ""
 	for member in Members.select().order_by(Members.referrals.desc(), Members.username.asc()):
 		if member.referrals < current_points:
-			result_string += str(rank)+"| "+members_string[:-2]+" |"+str(current_points)+"\n"
+			result_string += str(rank)+"| "+members_string[:-2]+" | "+str(current_points)+" | "+ranker.get_rank(current_points)+"\n"
 			members_string = member.username+", "
 			current_points = member.referrals
 			rank += 1
 		else:
 			members_string += member.username+", "
 
-	result_string += str(rank)+"| "+members_string[:-2]+" |"+str(current_points)+"\n"
+	result_string += str(rank)+"| "+members_string[:-2]+" | "+str(current_points)+" | "+ranker.get_rank(current_points)+"\n"
 	
 	db.close()
 	return result_string

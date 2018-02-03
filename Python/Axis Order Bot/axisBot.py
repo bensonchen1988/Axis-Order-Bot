@@ -57,7 +57,7 @@ def spread_the_word():
 			for comment in r.subreddit(subreddit).comments(limit = configAxis.comment_limit):
 				has_comment = db.has_comment(comment.id)
 
-				if check_word(comment.body.lower()) and not has_comment and comment.author != r.user.me() and not db.has_faith(comment.author.name):
+				if check_word(comment.body.lower()) and not has_comment and comment.author != r.user.me() and not db.has_faith(comment.author.name) and not any(x == subreddit for x in configAxis.manual_subreddits):
 					db.record_comment(comment.id)
 					logger.info("Comment found: "+comment.id)
 					#bot default invite
@@ -138,24 +138,31 @@ def parse_parameters(comment):
 	if "join" in comment.body.lower():
 		sign_them_up(comment)
 
-	#Faith check
-	if not db.has_faith(comment.author.name):
-		comment.reply(configAxis.not_a_member)
-		return	
-
 	#=========MEMBERS ONLY FUNCTION START============
 	#invites the author of the parent comment to this current comment if that person has not yet joined the order
 	if "invite" in comment.body.lower():
+		#Faith check
+		if not db.has_faith(comment.author.name):
+			comment.reply(configAxis.not_a_member)
+			return	
 		#members only function
 		members.member_invite(comment)
 
 	#アクシズ教、教義！
 	if any(x in comment.body.lower() for x in configAxis.teaching_hit_words):
+		#Faith check
+		if not db.has_faith(comment.author.name):
+			comment.reply(configAxis.not_a_member)
+			return	
 		#members only function
 		members.member_pray(comment)
 
 	#replies stats of author of comment
 	if "stats" in comment.body.lower():
+		#Faith check
+		if not db.has_faith(comment.author.name):
+			comment.reply(configAxis.not_a_member)
+			return	
 		#members only function
 		members.member_stats(comment)
 
@@ -165,7 +172,10 @@ def parse_parameters(comment):
 
 
 def forward_inbox(message):
-	r.redditor(configAxis.forward_username).message("Inbox forward from "+configAxis.username+", from "+message.author.name, message.body)
+	if isinstance(message, Comment):
+		r.redditor(configAxis.forward_username).message("Inbox forward from "+configAxis.username+", from "+message.author.name, message.body+"\n\n  "+message.context)
+	else:
+		r.redditor(configAxis.forward_username).message("Inbox forward from "+configAxis.username+", from "+message.author.name, message.body)
 
 
 def send_exception(body):
@@ -176,7 +186,7 @@ def sign_them_up(message):
 	if not db.has_faith(message.author.name):
 		print("Found a sucker!: "+message.author.name+" "+message.id)
 		db.member_signup(message.author.name)
-		message.reply("WELCOME TO THE BLESSED AXIS ORDER! You are member #"+db.get_member_number(message.author.name)+"! May you receive the blessings of the Holy Water Goddess Aqua!")
+		message.reply("WELCOME TO THE BLESSED AXIS ORDER! You are member #"+db.get_member_number(message.author.name)+"! May you receive the blessings of the Holy Water Goddess Aqua!" +util.get_footer())
 		logger.info(message.author.name +" has joined Axis Order!")
 		print(message.author.name +" has joined Axis Order!")
 		if isinstance(message, Comment) and not isinstance(message.parent(), Submission):
@@ -195,7 +205,8 @@ def sign_them_up(message):
 
 def update_rankings():
 	wiki = r.subreddit(configAxis.wiki_subreddit).wiki[configAxis.wiki_name]
-	wiki.edit(db.get_ranking_string())
+	number_of_members = "There are currently "+db.get_number_of_members()+" members in the Axis Order!\n\n"
+	wiki.edit(number_of_members+db.get_ranking_string())
 
 r = bot_login()
 db.safe_create_tables()

@@ -33,19 +33,25 @@ def member_stats(comment):
 	_reply_stats(comment)
 
 def member_pray(comment):
-
+	print("submission id: "+comment.submission.fullname)
 	if "all" in comment.body.lower() or "-a" in comment.body.lower():
 		all_message = ""
 		if db.can_receive_points_from_prayer(comment.author.name):
-			db.add_points(comment.author.name, 3)
-			all_message += "You've gained 3 points for reciting all the teachings maniacally in one breath!: \n\n"
+			points = 2
+			if comment.submission.fullname == configAxis.pray_submission_id:
+				points = 3
+			db.add_points(comment.author.name, points)
+			all_message += "You've gained "+str(points)+" points for reciting all the teachings maniacally in one breath!: \n\n"
 			db.update_pray_time(comment.author.name)
 		comment.reply(all_message+util.get_all_teachings()+util.get_footer())
 	else:
 		single_message = ""
 		if db.can_receive_points_from_prayer(comment.author.name):
-			db.add_points(comment.author.name, 1)
-			single_message += "You've gained 1 point for reciting the following teachings!: \n\n"
+			points = 1
+			if comment.submission.fullname == configAxis.pray_submission_id:
+				points = 2
+			db.add_points(comment.author.name, points)
+			single_message += "You've gained "+str(points)+" "+util.add_s(points, "point")+" for reciting the following teachings!: \n\n"
 			db.update_pray_time(comment.author.name)
 		comment.reply(single_message+util.get_random_teaching()+util.get_footer())
 
@@ -71,7 +77,6 @@ def _invite_submission(submission, inviting_comment):
 	submission.reply(util.get_invite_image()+util.get_footer()+" ^("+configAxis.invitation+inviting_comment.author.name+")")
 	logger.info("Replied to submission at "+submission.shortlink)
 	print("Replied to submission at "+submission.shortlink)
-	db.record_comment(submission.id)
 
 
 def _reply_stats(comment):

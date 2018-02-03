@@ -3,17 +3,21 @@ password = ""
 client_id = ""
 client_secret = ""
 subreddits = [""]
+blacklisted_subreddits = [""]
+manual_subreddits = [""]
 wiki_subreddit = ""
 wiki_name = ""
-forward_username = "" #User to forward all inbox messages this bot receives. To use, set configAxisFlags.inbox_forwarding to True
-invite_image = "https://imgur.com/a/ArJlZ"
+forward_username = ""
+invite_image = ""
+pray_submission_id = ""
+pray_thread_url = ""
 
 #number of comments to sift through
 comment_limit = 100
 
-bot_call_words = ["!axisorder", "!axisbot", "axis_order", "!axis_bot", "!axis_order_bot", "!axisorderbot", "!axisorder_bot", "!axis_orderbot"]
+bot_call_words = ["!axisorder", "!axisbot", "!axis_order", "!axis_bot"]
 
-hit_words = ["aqua", "axis order", "eris order", "アクシズ教", "axis cult", "alcanretia", "eris-sama", "eris sama", "konosuba", "kono subarashii sekai"]
+hit_words = ["aqua", "axis order", "eris order", "アクシズ教", "axis cult", "alcanretia", "eris-sama", "eris sama", "konosuba", "kono subarashii sekai", "このすば", "この素晴"]
 
 teaching_hit_words = ["commandment", "teaching", "dogma", "doctrine", "pray"]
 
@@ -40,10 +44,10 @@ teachings = ["Axis Followers can get things done. And because you can get things
 
 not_a_member = "Sorry, you must be a follower of the Axis Order in order to order the Axis Order bot around! Reply with \"!join\" to join, or join anytime by commenting \"!axisbot join\" anywhere in this subreddit!"
 
-help_two = "The following parameters are available. Please don't use multiples at the same time: \n\n"
-help_table1 = "Parameter| Members Only | What it does\n"
-help_table2 = "---|---|----\n"
-help_table3 = "invite| Yes | Makes the bot reply an invitation to the comment you've replied to, with you as the referral. You will be credited 5 points whenever anyone joins the order via that invitation.\n"
-help_table4 = "stats| Yes| Makes the bot reply to you with your membership number, points, and points until next rank.\n"
-help_table5 = "commandment **OR** teaching **OR** dogma **OR** doctrine **OR** pray| Yes| Makes the bot recite one random teaching of the Axis Order! Add ***all*** or ***-a*** to recite all of the teachings at once! You can gain 1 point (3 points for an all-recite) once every 22 hours for reciting!\n"
-help_table6 = "help| No | Displays this\n"	
+help_two = "The following parameters are available. You may use multiples at once: \n\n"
+help_table1 = "Parameter| Members Only | What it does | Usage Example\n"
+help_table2 = "---|---|---|----\n"
+help_table3 = "invite| Yes | Makes the bot reply an invitation to the comment you've replied to, with you as the referral. You will be credited 5 points whenever anyone joins the order via that invitation. | !axisbot invite\n"
+help_table4 = "stats| Yes| Makes the bot reply to you with your membership number, points, and points until next rank. | !axisbot stats\n"
+help_table5 = "commandment **OR** teaching **OR** dogma **OR** doctrine **OR** pray| Yes| Makes the bot recite one random teaching of the Axis Order! Add ***all*** or ***-a*** to recite all of the teachings at once! You can gain 1 point (2 points for an all-recite) once every 22 hours for reciting! Reciting in the official prayer thread gives you 1 extra point! | !axisbot pray -a\n"
+help_table6 = "help| No | Displays this | !axisbot help\n"	
