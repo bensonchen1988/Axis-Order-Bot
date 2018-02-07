@@ -8,7 +8,7 @@ Uses Peewee as ORM, with PostgreSQL as the DB.
 This is still a work in progress.
 
 TODO: 
-- Rank-based permission to various functions
+- Rank-based permission to various functions. Function idea: generate image macro
 - Ways to spend points (Buy skills/functions?)
 - ~Think of a way to get around Heroku's 10000 row limit in DB without paying. ~ DONE...?*
 
