@@ -178,11 +178,11 @@ def get_ranking_string():
 	for member in Members.select().order_by(Members.referrals.desc(), Members.username.asc()):
 		if member.referrals < current_points:
 			result_string += str(rank)+"| "+members_string[:-2]+" | "+str(current_points)+" | "+ranker.get_rank(current_points)+"\n"
-			members_string = member.username+", "
+			members_string = axisUtility.escape_reddit_chars(member.username)+", "
 			current_points = member.referrals
 			rank += 1
 		else:
-			members_string += member.username+", "
+			members_string += axisUtility.escape_reddit_chars(member.username)+", "
 
 	result_string += str(rank)+"| "+members_string[:-2]+" | "+str(current_points)+" | "+ranker.get_rank(current_points)+"\n"
 	

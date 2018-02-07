@@ -6,6 +6,7 @@ import praw
 from praw.models import Comment
 from praw.models import Submission
 import logging
+import axisMeme
 
 logger = logging.getLogger('axis_order')
 hdlr = logging.FileHandler('axis_order.log')
@@ -34,12 +35,15 @@ def member_stats(comment):
 
 def member_pray(comment):
 	print("submission id: "+comment.submission.fullname)
+
+	points = 0
+	if comment.submission.fullname == configAxis.pray_submission_id:
+		points += 1
+
 	if "all" in comment.body.lower() or "-a" in comment.body.lower():
 		all_message = ""
 		if db.can_receive_points_from_prayer(comment.author.name):
-			points = 2
-			if comment.submission.fullname == configAxis.pray_submission_id:
-				points = 3
+			points += 2
 			db.add_points(comment.author.name, points)
 			all_message += "You've gained "+str(points)+" Axis Points for reciting all the teachings maniacally in one breath!: \n\n"
 			db.update_pray_time(comment.author.name)
@@ -47,13 +51,22 @@ def member_pray(comment):
 	else:
 		single_message = ""
 		if db.can_receive_points_from_prayer(comment.author.name):
-			points = 1
-			if comment.submission.fullname == configAxis.pray_submission_id:
-				points = 2
+			points += 1
 			db.add_points(comment.author.name, points)
 			single_message += "You've gained "+str(points)+" Axis "+util.add_s(points, "Point")+" for reciting the following teachings!: \n\n"
 			db.update_pray_time(comment.author.name)
-		comment.reply(single_message+util.get_random_teaching()+util.get_footer())
+		comment.reply(single_message+util.get_single_teaching(comment)+util.get_footer())
+
+def member_meme(comment):
+	if int(db.get_referrals(comment.author.name)) < configAxis.points_to_meme:
+		comment.reply("Sorry, but you must be of rank \""+ranker.get_rank(configAxis.points_to_meme)+"\" ("+str(configAxis.points_to_meme)+" Axis Points) or higher to channel the divine words of our dear Goddess Aqua!"+util.get_footer())
+		return
+	text = comment.body.lower()
+	index = text.find("!meme ")
+	if index == -1 or text[index+6:] == "":
+		comment.reply(axisMeme.get_meme_hyperlink(" ")+util.get_footer())
+		return
+	comment.reply(axisMeme.get_meme_hyperlink(text[index+6:])+util.get_footer())
 
 #Sends spam to target comment
 def _invite_comment(comment, referralname):
@@ -65,7 +78,7 @@ def _invite_comment(comment, referralname):
 	if referralname is None:
 		comment.reply(util.get_invite_image()+util.get_footer())
 	else:
-		comment.reply(util.get_invite_image()+util.get_footer()+" ^("+configAxis.invitation+referralname+")")
+		comment.reply(util.get_invite_image()+util.get_footer()+" ^("+configAxis.invitation+util.escape_reddit_chars(referralname)+")")
 
 
 	log_body = "Replied to user "+comment.author.name
@@ -74,7 +87,7 @@ def _invite_comment(comment, referralname):
 #Sends spam to target submission
 def _invite_submission(submission, inviting_comment):
 	print("Inviting submission")
-	submission.reply(util.get_invite_image()+util.get_footer()+" ^("+configAxis.invitation+inviting_comment.author.name+")")
+	submission.reply(util.get_invite_image()+util.get_footer()+" ^("+configAxis.invitation+util.escape_reddit_chars(inviting_comment.author.name)+")")
 	logger.info("Replied to submission at "+submission.shortlink)
 	print("Replied to submission at "+submission.shortlink)
 

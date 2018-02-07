@@ -43,7 +43,7 @@ def run_bot(r):
 	print("checked inbox")
 	spread_the_word()
 	print("checked newest "+str(configAxis.comment_limit)+" comments")
-	#TEMPORARY 200 LIMIT
+	#TEMPORARY 200 limit
 	db.trim_replied_comments(configAxis.comment_limit+100)
 	print("finished trimming replied comments")
 	update_rankings()
@@ -128,16 +128,16 @@ def bot_invite(comment):
 #Allows multiple parameter call
 def parse_parameters(comment):
 	#助けてよ~！！
-	if "help" in comment.body.lower():
+	if "!help" in comment.body.lower():
 		comment.reply(util.get_help())
 
 	#Someone wants to join via botcall LOL! GET SCAMMED BRUH
-	if "join" in comment.body.lower():
+	if "!join" in comment.body.lower():
 		sign_them_up(comment)
 
 	#=========MEMBERS ONLY FUNCTION START============
 	#invites the author of the parent comment to this current comment if that person has not yet joined the order
-	if "invite" in comment.body.lower():
+	if "!invite" in comment.body.lower():
 		#Faith check
 		if not db.has_faith(comment.author.name):
 			comment.reply(configAxis.not_a_member)
@@ -155,13 +155,21 @@ def parse_parameters(comment):
 		members.member_pray(comment)
 
 	#replies stats of author of comment
-	if "stats" in comment.body.lower():
+	if "!stats" in comment.body.lower():
 		#Faith check
 		if not db.has_faith(comment.author.name):
 			comment.reply(configAxis.not_a_member)
 			return	
 		#members only function
 		members.member_stats(comment)
+
+	if "!meme" in comment.body.lower():
+		#Faith check
+		if not db.has_faith(comment.author.name):
+			comment.reply(configAxis.not_a_member)
+			return	
+		#members only function
+		members.member_meme(comment)
 
 
 	#=========MEMBERS ONLY FUNCTION END============
@@ -190,9 +198,10 @@ def sign_them_up(message):
 			comment = r.comment(message.id)
 			if configAxis.invitation in comment.parent().body and comment.parent().author.name == r.user.me().name:
 				wordlist = comment.parent().body.split()
-				db.add_points(wordlist[-1][:-1], 5)
-				logger.info(wordlist[-1][:-1]+" has been credited +5 points for the referral")
-				print(wordlist[-1][:-1]+" has been credited +5 points for the referral")
+				username = util.unescape_reddit_chars(wordlist[-1][:-1])
+				db.add_points(username, 5)
+				logger.info(username+" has been credited +5 points for the referral")
+				print(username+" has been credited +5 points for the referral")
 	else:
 		num_members_string = db.get_number_of_members()
 		message.reply("Hello fellow faithful, it seems like you already belong to the wonderful Axis Order! You are member #"+db.get_member_number(message.author.name)+" of "+db.get_number_of_members()+" "+util.add_s(int(num_members_string), "member")+"!")

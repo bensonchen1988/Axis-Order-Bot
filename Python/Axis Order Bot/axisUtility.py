@@ -1,6 +1,7 @@
 import configAxis
 import random
 import axis_database as db
+import string
 
 def add_s(points, word):
 	if points > 1:
@@ -14,7 +15,27 @@ def get_footer():
 def get_invite_image():
 	return "["+random.choice(configAxis.phrases)+"]("+configAxis.invite_image+") \n\n"
 
-def get_random_teaching():
+def get_single_teaching(comment):
+	text = comment.body.lower()
+	if "fault" in text:
+		return configAxis.teachings[0]
+	if "run" in text:
+		return configAxis.teachings[1]
+	if "regret" in text:
+		return configAxis.teachings[2]
+	if "neet" in text:
+		return configAxis.teachings[3]
+	if "glut" in text:
+		return configAxis.teachings[4]
+	if "happy" in text:
+		return configAxis.teachings[5]
+	if "slay" in text:
+		return configAxis.teachings[6]
+	if "pad" in text:
+		return configAxis.teachings[7]
+	if "loli" in text:
+		return configAxis.teachings[8]
+
 	return random.choice(configAxis.teachings)
 
 def get_all_teachings():
@@ -37,6 +58,7 @@ def get_help():
 	result += configAxis.help_table4
 	result += configAxis.help_table5
 	result += configAxis.help_table6
+	result += configAxis.help_table7
 	result += get_footer()
 	return result
 
@@ -45,3 +67,11 @@ def get_subreddits():
 	for sub in configAxis.subreddits:
 		result += "/r/"+sub+" "
 	return result
+
+def escape_reddit_chars(target_string):
+	result = target_string.replace("_", "\_")
+
+	return result
+
+def unescape_reddit_chars(target_string):
+	return target_string.replace("\\", "")
