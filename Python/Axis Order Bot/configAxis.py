@@ -11,7 +11,8 @@ forward_username = ""
 invite_image = ""
 pray_submission_id = ""
 pray_thread_url = ""
-points_to_meme = 0
+points_to_meme = 5
+points_to_memestrike = 20
 
 #number of comments to sift through
 comment_limit = 100
@@ -51,5 +52,5 @@ help_table2 = "---|---|---|----\n"
 help_table3 = "!invite| Yes | Makes the bot reply an invitation to the comment you've replied to, with you as the referral. You will be credited 5 points whenever anyone joins the order via that invitation. | !axisbot !invite\n"
 help_table4 = "!stats| Yes| Makes the bot reply to you with your membership number, points, and points until next rank. | !axisbot !stats\n"
 help_table5 = "!commandment **OR** !teaching **OR** !dogma **OR** !doctrine **OR** !pray| Yes| Makes the bot recite one random teaching of the Axis Order! Add ***all*** or ***-a*** to recite all of the teachings at once! You can gain 1 point (2 points for an all-recite) once every 22 hours for reciting! Reciting in the official prayer thread gives you 1 extra point! | !axisbot !pray -a\n"
-help_table6 = "!meme | Yes (>"+str(points_to_meme)+" Points) | Generates a meme image of a randomly selected picture of Aqua with text you've supplied! A picture with no text will be returned if no text is supplied. This function makes use the the imgflip API.| !axisbot !meme text here\n"
+help_table6 = "!meme | Yes (>"+str(points_to_meme)+" Points) | Generates a meme image of a randomly selected picture of Aqua with text you've supplied! A picture with no text will be returned if no text is supplied. This function makes use the the imgflip API. [Please check here for ordering Meme Strikes](https://www.reddit.com/r/axisorderbot/wiki/create/memestrike)| !axisbot !meme text here\n"
 help_table7 = "!help | No | Displays this | !axisbot !help\n"	

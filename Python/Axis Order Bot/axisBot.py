@@ -80,6 +80,17 @@ def spread_the_word():
 def check_inbox():
 	for message in r.inbox.unread():
 		message.mark_read()
+		#If it's a comment instance, find originating subreddit
+		#If subreddit is in configAxis.subreddits, record id to that subreddit's DB
+		#Else do nothing
+		if isinstance(message, Comment):
+			comment = r.comment(message.id)
+			subreddit_name = comment.subreddit.display_name
+			print("inbox:" + subreddit_name)
+			if any(x == subreddit_name for x in configAxis.subreddits):
+				print("recording")
+				db.record_comment(comment.id, subreddit_name)
+
 		if configAxisFlags.inbox_forwarding:
 			forward_inbox(message)
 
@@ -87,6 +98,10 @@ def check_inbox():
 			sign_them_up(message)
 			continue
 		if "!stats" in message.body.lower():
+			#Faith check
+			if not db.has_faith(message.author.name):
+				message.reply(configAxis.not_a_member)
+				continue	
 			#members only function
 			members.member_stats(message)
 			continue
@@ -100,6 +115,17 @@ def check_inbox():
 				continue
 			parse_parameters(message)
 			continue
+
+
+		if "!meme" in message.body.lower():
+			#Faith check
+			if not db.has_faith(message.author.name):
+				message.reply(configAxis.not_a_member)
+				continue	
+			#members only function
+			members.member_meme(message, r)
+			continue
+
 		#admin only function (all-member broadcasting)
 		if "!broadcast" in message.body.lower() and message.author.name == configAxis.forward_username:
 			bot_broadcast(message)
@@ -127,17 +153,21 @@ def bot_invite(comment):
 #Bot call parameter handling
 #Allows multiple parameter call
 def parse_parameters(comment):
+	valid_input = False
 	#助けてよ~！！
 	if "!help" in comment.body.lower():
+		valid_input = True
 		comment.reply(util.get_help())
 
 	#Someone wants to join via botcall LOL! GET SCAMMED BRUH
 	if "!join" in comment.body.lower():
+		valid_input = True
 		sign_them_up(comment)
 
 	#=========MEMBERS ONLY FUNCTION START============
 	#invites the author of the parent comment to this current comment if that person has not yet joined the order
 	if "!invite" in comment.body.lower():
+		valid_input = True
 		#Faith check
 		if not db.has_faith(comment.author.name):
 			comment.reply(configAxis.not_a_member)
@@ -147,6 +177,7 @@ def parse_parameters(comment):
 
 	#アクシズ教、教義！
 	if any(x in comment.body.lower() for x in configAxis.teaching_hit_words):
+		valid_input = True
 		#Faith check
 		if not db.has_faith(comment.author.name):
 			comment.reply(configAxis.not_a_member)
@@ -156,6 +187,7 @@ def parse_parameters(comment):
 
 	#replies stats of author of comment
 	if "!stats" in comment.body.lower():
+		valid_input = True
 		#Faith check
 		if not db.has_faith(comment.author.name):
 			comment.reply(configAxis.not_a_member)
@@ -164,16 +196,19 @@ def parse_parameters(comment):
 		members.member_stats(comment)
 
 	if "!meme" in comment.body.lower():
+		valid_input = True
 		#Faith check
 		if not db.has_faith(comment.author.name):
 			comment.reply(configAxis.not_a_member)
 			return	
 		#members only function
-		members.member_meme(comment)
+		members.member_meme(comment, r)
 
 
 	#=========MEMBERS ONLY FUNCTION END============
 
+	if not valid_input:
+		comment.reply("Hi, it looks like you've called me without providing a valid parameter! Have a look at the Help Wiki (linked below) for the latest available commands!" +util.get_footer())
 
 
 def forward_inbox(message):
