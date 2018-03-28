@@ -48,6 +48,7 @@ def run_bot(r):
 	print("finished trimming replied comments")
 	update_rankings()
 	print("updated rankings wiki at "+configAxis.wiki_subreddit)
+	#test
 	print("sleeping for 10s")	
 	time.sleep(10)
 
