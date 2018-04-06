@@ -38,6 +38,7 @@ def check_word(body):
 
 	return False		
 
+#hehe
 def run_bot(r):
 	check_inbox()
 	print("checked inbox")
