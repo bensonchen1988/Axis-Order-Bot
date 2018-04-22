@@ -88,6 +88,8 @@ def member_meme(comment, r):
 		#hacky id extraction.
 		comment_id = url[len(url)-8:len(url)-1]
 		target_post = None
+
+
 		try:
 			target_post = r.comment(comment_id)
 			target_post.parent()
@@ -97,20 +99,22 @@ def member_meme(comment, r):
 			except:
 				comment.reply("It seems that something went wrong! Please make sure you supply a proper full reddit URL when meme striking!"+util.get_footer())
 				return
+
 		index = text.find(url+" ")
 		#blacklist check
 		if any(x == target_post.subreddit.display_name for x in configAxis.blacklisted_subreddits):
 			comment.reply("Sorry, you can not order a meme strike into a proactively blacklisted subreddit!")
 			return
+
 		try:
 			if index == -1 or text[index+len(url+" "):] == "":
-				target_post.reply(axisMeme.get_meme_hyperlink(" ")+util.get_footer()+" ^(This is a Meme Strike ordered by member /u/"+comment.author.name+")")
+				target_post.reply(axisMeme.get_meme_hyperlink(" ")+util.get_footer_meme()+" ^(This is a Meme Strike ordered by member /u/"+comment.author.name+")")
 				return
-			target_post.reply(axisMeme.get_meme_hyperlink(text[index+len(url+" "):])+util.get_footer()+" ^(This is a Meme Strike ordered by member /u/"+comment.author.name+")")
+			target_post.reply(axisMeme.get_meme_hyperlink(text[index+len(url+" "):])+util.get_footer_meme()) #+" ^(This is a Meme Strike ordered by member /u/"+comment.author.name+")"
 		except:
 			comment.reply("It seems that something went wrong! This bot may have been banned from the subreddit you're trying to meme strike!"+util.get_footer())
 	else:
-		#normal memeing that replies to user
+		#normal memeing that replies to user via botcalls or username mention
 		index = text.find("!meme ")
 		if index == -1 or text[index+6:] == "":
 			comment.reply(axisMeme.get_meme_hyperlink(" ")+util.get_footer())
