@@ -12,6 +12,9 @@ def add_s(points, word):
 def get_footer():
 	return "\n\n ***** \n\n ^(I am a bot created to spread faith for the wonderful and divine Water Goddess Aqua! Reply \"!join\" to this bot to join the blessed Axis Order today! We currently have "+str(1000000+int(db.get_number_of_members()))+" followers! Reply !help for instructions. Reply feedbacks directly, or to /u/"+configAxis.forward_username+"!) ^| [^Help ^Wiki](https://www.reddit.com/r/"+configAxis.wiki_subreddit+"/wiki/index) ^| [^Point ^Rankings](https://www.reddit.com/r/"+configAxis.wiki_subreddit+"/wiki/"+configAxis.wiki_name+") ^| [^Official ^Pray ^Thread]("+configAxis.pray_thread_url+")"
 
+def get_footer_meme():
+	return "\n\n ***** \n\n ^(I am a bot!) ^| [^Help ^Wiki](https://www.reddit.com/r/"+configAxis.wiki_subreddit+"/wiki/index) ^| [^Point ^Rankings](https://www.reddit.com/r/"+configAxis.wiki_subreddit+"/wiki/"+configAxis.wiki_name+") ^| [^Official ^Pray ^Thread]("+configAxis.pray_thread_url+")"
+
 def get_invite_image():
 	return "["+random.choice(configAxis.phrases)+"]("+configAxis.invite_image+") \n\n"
 

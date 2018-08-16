@@ -38,7 +38,6 @@ def check_word(body):
 
 	return False		
 
-#hehe
 def run_bot(r):
 	check_inbox()
 	print("checked inbox")
@@ -49,7 +48,6 @@ def run_bot(r):
 	print("finished trimming replied comments")
 	update_rankings()
 	print("updated rankings wiki at "+configAxis.wiki_subreddit)
-	#test
 	print("sleeping for 10s")	
 	time.sleep(10)
 
@@ -118,6 +116,15 @@ def check_inbox():
 			parse_parameters(message)
 			continue
 
+		#アクシズ教、教義！
+		if any(x in comment.body.lower() for x in configAxis.teaching_hit_words):
+			valid_input = True
+			#Faith check
+			if not db.has_faith(comment.author.name):
+				comment.reply(configAxis.not_a_member)
+				return	
+			#members only function
+			members.member_pray(comment)
 
 		if "!meme" in message.body.lower():
 			#Faith check
@@ -249,7 +256,9 @@ def sign_them_up(message):
 def update_rankings():
 	wiki = r.subreddit(configAxis.wiki_subreddit).wiki[configAxis.wiki_name]
 	number_of_members = "There are currently "+db.get_number_of_members()+" members in the Axis Order!\n\n"
-	wiki.edit(number_of_members+db.get_ranking_string())
+	point_reqs = "Point threshold to unlock the !meme feature: " + str(configAxis.points_to_meme) +"\n\n"
+	point_reqs_strike = "Point threshold to unlock the !memestrike feature: " + str(configAxis.points_to_memestrike) + "\n\n"
+	wiki.edit(number_of_members+point_reqs+point_reqs_strike+db.get_ranking_string())
 
 r = bot_login()
 db.safe_create_tables()
@@ -267,6 +276,9 @@ while True:
 		except:
 			pass
 		logger.exception(str(e))
-		traceback.print_exc()
-		send_exception(traceback.format_exc())
+		exception_string = traceback.print_exc()
+		if "timeout" not in exception_string and "timed out" not in exception_string:
+			send_exception(exception_string)
+		else:
+			send_exception("Truncated ReadTimeoutError Exception.")
 		pass
